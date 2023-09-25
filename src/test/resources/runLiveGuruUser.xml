@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="LiveGuru - User">
+    <listeners>
+        <listener class-name="commons.MethodListener"/>
+        <listener class-name="reportConfig.ExtentReportListener"/>
+    </listeners>
+    <test name="Run on Firefox">
+        <parameter name="browser" value="firefox"/>
+        <packages>
+            <package name="com.liveGuru.user"/>
+        </packages>
+    </test>
+</suite>
