@@ -7,14 +7,27 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import pageUIs.liveGuru.user.BasePageNopCommerceUI;
+import pageObjects.liveGuru.user.UserLoginPO;
+import pageObjects.liveGuru.user.UserMyWishlistPO;
+import pageObjects.liveGuru.user.UserProductCategoryPO;
+import pageObjects.liveGuru.user.UserProductComparisonPO;
+import pageUIs.liveGuru.user.LiveGuruBasePageUI;
+import pageUIs.liveGuru.user.UserAccountPageUI;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
 
 public class BasePage {
     private final long longTimeout = GlobalConstants.LONG_TIMEOUT;
@@ -194,6 +207,17 @@ public class BasePage {
         element.clear();
         element.sendKeys(textValue);
     }
+
+    protected void clearElement(WebDriver driver, String locatorType) {
+        WebElement element = getWebElement(driver, locatorType);
+        element.clear();
+    }
+
+    protected void clearElement(WebDriver driver, String locatorType, String... dynamicValues) {
+        WebElement element = getWebElement(driver, locatorType, dynamicValues);
+        element.clear();
+    }
+
 
     public String getElementText(WebDriver driver, String locatorType) {
         return getWebElement(driver, locatorType).getText();
@@ -637,9 +661,124 @@ public class BasePage {
      * @param value  text value
      */
     public void inputToTextboxById(WebDriver driver, String textID, String value) {
-        waitForElementVisibility(driver, BasePageNopCommerceUI.DYNAMIC_TEXTBOX_BY_ID, textID);
-        sendkeyToElement(driver, BasePageNopCommerceUI.DYNAMIC_TEXTBOX_BY_ID, value, textID);
+        waitForElementVisibility(driver, LiveGuruBasePageUI.DYNAMIC_TEXTBOX_BY_ID, textID);
+        sendkeyToElement(driver, LiveGuruBasePageUI.DYNAMIC_TEXTBOX_BY_ID, value, textID);
+    }
+
+    /**
+     * Click to the link at the footer by text link
+     *
+     * @param driver
+     * @param textLink The text link onUI
+     */
+    public void clickToFooterLinkByText(WebDriver driver, String textLink) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.FOOTER_LINK_BY_TEXT, textLink);
+        clickToElement(driver, LiveGuruBasePageUI.FOOTER_LINK_BY_TEXT, textLink);
+    }
+
+    protected void deleteFileByFilePath(String filePath) {
+        try {
+            Files.deleteIfExists(
+                    Paths.get(filePath));
+        } catch (NoSuchFileException e) {
+            System.out.println(
+                    "No such file/directory exists");
+        } catch (DirectoryNotEmptyException e) {
+            System.out.println("Directory is not empty.");
+        } catch (IOException e) {
+            System.out.println("Invalid permissions.");
+        }
+
+    }
+
+    protected void writeDataIntoDataRecordByFileName(String data, String fileName) {
+        File file = new File(GlobalConstants.DATA_RECORD + fileName + ".txt");
+        FileWriter fr = null;
+        try {
+            fr = new FileWriter(file, true);
+            fr.write(data);
+            fr.write("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert fr != null;
+                fr.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
+    public String getValueTextboxById(WebDriver driver, String id) {
+        waitForElementVisibility(driver, LiveGuruBasePageUI.DYNAMIC_TEXTBOX_BY_ID, id);
+        return getElementAttribute(driver, "value", LiveGuruBasePageUI.DYNAMIC_TEXTBOX_BY_ID, id);
+    }
+
+    public void clickToAccountLinkHeader(WebDriver driver) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.ACCOUNT_LINK_HEADER);
+        clickToElement(driver, LiveGuruBasePageUI.ACCOUNT_LINK_HEADER);
+
+    }
+
+    public UserLoginPO clickToLoginLinkAtAccountLinkHeader(WebDriver driver) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.LOGIN_LINK_AT_ACCOUNT_HEADER);
+        clickToElement(driver, LiveGuruBasePageUI.LOGIN_LINK_AT_ACCOUNT_HEADER);
+        return PageGeneratorManager.getUserLoginPage(driver);
+    }
+
+    public UserMyWishlistPO clickToMyWishlistLinkAtAccountLinkHeader(WebDriver driver) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.MY_WISHLIST_LINK_AT_ACCOUNT_HEADER);
+        clickToElement(driver, LiveGuruBasePageUI.MY_WISHLIST_LINK_AT_ACCOUNT_HEADER);
+        return PageGeneratorManager.getUserMyWishlistPage(driver);
+    }
+
+
+    public UserProductCategoryPO clickToMobileLinkAtHeaderNav(WebDriver driver) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.MOBILE_LINK_AT_NAVIGATION_BAR);
+        clickToElement(driver, LiveGuruBasePageUI.MOBILE_LINK_AT_NAVIGATION_BAR);
+        return PageGeneratorManager.getUserProductCategoryPage(driver);
+
+    }
+
+    public void clickToDynamicLinkOnTheLeftSidebar(WebDriver driver, String linkText) {
+        waitForElementClickable(driver, UserAccountPageUI.DYNAMIC_LINK_AT_LEFT_SIDEBAR, linkText);
+        clickToElement(driver, UserAccountPageUI.DYNAMIC_LINK_AT_LEFT_SIDEBAR, linkText);
+    }
+
+
+    public UserProductComparisonPO switchToProductComparisonPage(WebDriver driver) {
+        switchToWindowByTitle(driver, LiveGuruBasePageUI.COMPARISON_WINDOW_TITLE);
+        return PageGeneratorManager.getUserProductComparisonPage(driver);
+    }
+
+    public void closeTheComparisonProductWindow(WebDriver driver) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.CLOSE_WINDOW_BUTTON);
+        clickToElement(driver, LiveGuruBasePageUI.CLOSE_WINDOW_BUTTON);
+        switchToWindowByTitle(driver, LiveGuruBasePageUI.MOBILE_WINDOW_TITLE);
+    }
+
+    public boolean isCurrentActiveLinkAtAccountPageByText(WebDriver driver, String linkText) {
+        waitForElementVisibility(driver, UserAccountPageUI.CURRENT_ACTIVE_LINK_AT_LEFT_SIDEBAR, linkText);
+        return isElementDisplayed(driver, UserAccountPageUI.CURRENT_ACTIVE_LINK_AT_LEFT_SIDEBAR, linkText);
+    }
+
+
+    public UserProductCategoryPO clickToTVLinkAtHeaderNav(WebDriver driver) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.TV_LINK_AT_NAVIGATION_BAR);
+        clickToElement(driver, LiveGuruBasePageUI.TV_LINK_AT_NAVIGATION_BAR);
+        return PageGeneratorManager.getUserProductCategoryPage(driver);
+
+    }
+
+    public void enterToTextboxEmptyValueById(WebDriver driver, String id) {
+        waitForAllElementVisibility(driver, LiveGuruBasePageUI.DYNAMIC_TEXTBOX_BY_ID, id);
+        clearElement(driver, LiveGuruBasePageUI.DYNAMIC_TEXTBOX_BY_ID, id);
+    }
+
+    public void selectToDefaultDropdownById(WebDriver driver, String Id, String textOption) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.DYNAMIC_DEFAULT_DROPDOWN_BY_ID, Id);
+        selectItemInDefaultDropdown(driver, LiveGuruBasePageUI.DYNAMIC_DEFAULT_DROPDOWN_BY_ID, textOption, Id);
+    }
 }

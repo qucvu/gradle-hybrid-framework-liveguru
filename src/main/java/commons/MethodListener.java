@@ -36,7 +36,7 @@ public class MethodListener implements IInvokedMethodListener {
                 if (size == 1) {
                     result.setThrowable(failures.get(0));
                 } else {
-                    StringBuffer message = new StringBuffer("Multiple failures (").append(size).append("):\n");
+                    StringBuilder message = new StringBuilder("Multiple failures (").append(size).append("):\n");
                     for (int failure = 0; failure < size - 1; failure++) {
                         message.append("Failure ").append(failure + 1).append(" of ").append(size).append("\n");
                         message.append(Utils.longStackTrace(failures.get(failure), false)).append("\n");

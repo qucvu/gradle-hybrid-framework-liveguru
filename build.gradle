@@ -21,6 +21,8 @@ version '1.0-SNAPSHOT'
 
 
 dependencies {
+    implementation 'org.jetbrains:annotations:20.1.0'
+
     // https://mvnrepository.com/artifact/org.testng/testng
     compile group: 'org.testng', name: 'testng', version: '6.14.3'
 
@@ -49,10 +51,9 @@ dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.0'
 
     // https://mvnrepository.com/artifact/log4j/log4j
-    compile group: 'log4j', name: 'log4j', version: '1.2.16'
-
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.24'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.19.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.19.0'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '2.0.7'
 
     // https://mvnrepository.com/artifact/velocity/velocity-dep
     compile group: 'velocity', name: 'velocity-dep', version: '1.4'
@@ -81,8 +82,9 @@ test {
         showStandardStreams = true //show log in console
     }
 
-    systemProperty 'envGradle', System.getProperty('envGradle', 'envGradle')
 
+    systemProperty 'environment', System.getProperty('envGradle', 'environment')
+    systemProperty 'org.freemarker.loggerLibrary', 'none'
     systemProperty "file.encoding", "utf-8"
     reports.html.setDestination(file("$projectDir/gradle-output"))
 
