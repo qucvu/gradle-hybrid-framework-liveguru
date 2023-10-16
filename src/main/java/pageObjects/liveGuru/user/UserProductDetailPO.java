@@ -30,4 +30,31 @@ public class UserProductDetailPO extends BasePage {
         clickToElement(driver, UserProductDetailPageUI.ADD_YOUR_REVIEW_LINK);
         return PageGeneratorManager.getUserProductReviewPage(driver);
     }
+
+    public void clickToQuantityReviewsLink() {
+        waitForElementClickable(driver, UserProductDetailPageUI.QUANTITY_REVIEWS_LINK);
+        clickToElement(driver, UserProductDetailPageUI.QUANTITY_REVIEWS_LINK);
+    }
+
+    public boolean isSummaryReviewDisplayedByNickname(String nickname, String summaryReview) {
+        waitForElementVisibility(driver, UserProductDetailPageUI.SUMMARY_REVIEW_BY_NICKNAME, nickname, summaryReview);
+        return isElementDisplayed(driver, UserProductDetailPageUI.SUMMARY_REVIEW_BY_NICKNAME, nickname, summaryReview);
+    }
+
+    public boolean isThoughtReviewDisplayedByNickname(String nickname, String thoughtReview) {
+        waitForElementVisibility(driver, UserProductDetailPageUI.THOUGHT_REVIEW_BY_NICKNAME, nickname, thoughtReview);
+        return isElementDisplayed(driver, UserProductDetailPageUI.THOUGHT_REVIEW_BY_NICKNAME, nickname, thoughtReview);
+    }
+
+    public boolean isRatingReviewDisplayedByNickname(String nickname, String qualityRateReview) {
+        waitForElementVisibility(driver, UserProductDetailPageUI.QUANTITY_RATE_VIEW_BY_NICKNAME, nickname);
+        String styleAttribute = getElementAttribute(driver, "style", UserProductDetailPageUI.QUANTITY_RATE_VIEW_BY_NICKNAME, nickname);
+        int quantityRate = Integer.parseInt(styleAttribute.substring(7, styleAttribute.indexOf(";") - 1)) / 20;
+        return String.valueOf(quantityRate).equals(qualityRateReview);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("width:6%;".substring(6, "width:60%;".indexOf(";") - 1));
+
+    }
 }

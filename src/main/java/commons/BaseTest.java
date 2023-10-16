@@ -3,12 +3,15 @@ package commons;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
@@ -115,15 +118,26 @@ public class BaseTest {
                 WebDriverManager.firefoxdriver().setup();
                 System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true");
                 System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, GlobalConstants.PROJECT_PATH + "\\browserLogs\\Firefox.log");
-                System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
-                driver = new FirefoxDriver();
+                FirefoxProfile profile = new FirefoxProfile();
+                // Save files to a specific folder
+                profile.setPreference("browser.download.folderList", 2);
+                profile.setPreference("browser.download.dir", GlobalConstants.DOWNLOAD_FILE_FOLDER);
+                profile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream");
+                // disable open files in a new tab
+                profile.setPreference("browser.helperApps.alwaysAsk.force", false);
+                profile.setPreference("browser.download.manager.showWhenStarting", false);
+                profile.setPreference("browser.download.panel.shown", false);
+                profile.setPreference("pdfjs.disabled", true);
+                FirefoxOptions fireFoxoptions = new FirefoxOptions();
+                fireFoxoptions.setProfile(profile);
+                driver = new FirefoxDriver(fireFoxoptions);
                 break;
             case "h_firefox":
                 WebDriverManager.firefoxdriver().setup();
-                FirefoxOptions options = new FirefoxOptions();
-                options.addArguments("-headless");
-                options.addArguments("window-size=1920x1080");
-                driver = new FirefoxDriver(options);
+                FirefoxOptions hFirefoxOptions = new FirefoxOptions();
+                hFirefoxOptions.addArguments("-headless");
+                hFirefoxOptions.addArguments("window-size=1920x1080");
+                driver = new FirefoxDriver(hFirefoxOptions);
                 break;
             case "chrome":
 //			WebDriverManager.chromedriver().setup();
@@ -160,6 +174,7 @@ public class BaseTest {
                 throw new RuntimeException("Browser name invalid");
         }
         driver.get(url);
+        driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(GlobalConstants.LONG_TIMEOUT, TimeUnit.SECONDS);
 
         return driver;
@@ -236,7 +251,7 @@ public class BaseTest {
             String driverInstanceName = driver.toString().toLowerCase();
             log.info("Driver instance name = " + driverInstanceName);
 
-            String browserDriverName = null;
+            String browserDriverName;
 
             if (driverInstanceName.contains("chrome")) {
                 browserDriverName = "chromedriver";
@@ -274,6 +289,34 @@ public class BaseTest {
                 e.printStackTrace();
             }
         }
+    }
+
+    protected String getCurrentDateTimeUTC() {
+        DateTime now = new DateTime(DateTimeZone.UTC);
+        return now.toString();
+    }
+
+
+    protected String getCurrentDate() {
+        DateTime nowUTC = new DateTime(DateTimeZone.UTC);
+        int day = nowUTC.getDayOfMonth();
+        if (day < 10) {
+            return "0" + day;
+
+        }
+        return String.valueOf(day);
+    }
+
+    protected String getCurrentMonth() {
+        DateTime now = new DateTime(DateTimeZone.UTC);
+        return now.toString("MM");
+
+    }
+
+
+    protected String getCurrentYear() {
+        DateTime now = new DateTime(DateTimeZone.UTC);
+        return String.valueOf(now.getYear());
     }
 
 

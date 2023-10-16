@@ -35,7 +35,7 @@ public class User_04_Search extends BaseTest {
         homePage = PageGeneratorManager.getUserHomePage(driver);
 
         log.info("Pre conditions - Step 02: Click to 'Advanced Search' link at the footer");
-        homePage.clickToFooterLinkByText(driver, "Advanced Search");
+        homePage.clickToDynamicFooterLinkByText(driver, "Advanced Search");
         advancedSearchPage = PageGeneratorManager.getUserAdvancedSearchPage(driver);
     }
 
@@ -63,7 +63,7 @@ public class User_04_Search extends BaseTest {
     public void Search_02_Search_Range_151_To_1000(Method method) {
         ExtentTestManager.startTest(method.getName(), "Search_02_Search_Range_151_To_1000");
         ExtentTestManager.getTest().log(Status.INFO, "Search High Range - Step 01: Click to 'Advanced Search' link at the footer");
-        homePage.clickToFooterLinkByText(driver, "Advanced Search");
+        homePage.clickToDynamicFooterLinkByText(driver, "Advanced Search");
         advancedSearchPage = PageGeneratorManager.getUserAdvancedSearchPage(driver);
 
         ExtentTestManager.getTest().log(Status.INFO, "Search High Range - Step 02: Enter to 'From Price' with value: " + minHighPriceRange);
@@ -94,9 +94,4 @@ public class User_04_Search extends BaseTest {
     private UserProductCategoryPO productCategoryPage;
     private float minLowPriceRange, maxLowPriceRange;
     private float minHighPriceRange, maxHighPriceRange;
-
-    public static void main(String[] args) {
-        float a = 0;
-        System.out.println(String.format("%.0f", a));
-    }
 }

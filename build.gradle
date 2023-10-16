@@ -75,7 +75,7 @@ dependencies {
 test {
 
     useTestNG() {
-        suites 'src/test/resources/runLiveGuruUser.xml'
+        suites 'src/test/resources/runLiveGuruAdmin.xml'
         outputDirectory = file("$projectDir/testng-report")
     }
     testLogging {

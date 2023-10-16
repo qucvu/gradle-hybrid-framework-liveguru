@@ -1,6 +1,8 @@
 package commons;
 
 import org.openqa.selenium.WebDriver;
+import pageObjects.AdminReviewDetailPO;
+import pageObjects.liveGuru.admin.*;
 import pageObjects.liveGuru.user.*;
 
 public class PageGeneratorManager {
@@ -16,7 +18,7 @@ public class PageGeneratorManager {
         return new UserRegisterPO(driver);
     }
 
-    public static UserAccountPO getUserMyAccountPage(WebDriver driver) {
+    public static UserAccountPO getUserAccountPage(WebDriver driver) {
         return new UserAccountPO(driver);
     }
 
@@ -51,4 +53,31 @@ public class PageGeneratorManager {
     public static UserAdvancedSearchPO getUserAdvancedSearchPage(WebDriver driver) {
         return new UserAdvancedSearchPO(driver);
     }
+
+    public static AdminLoginPO getAdminLoginPage(WebDriver driver) {
+        return new AdminLoginPO(driver);
+    }
+
+    public static AdminManageCustomerPO getAdminManageCustomerPage(WebDriver driver) {
+        return new AdminManageCustomerPO(driver);
+    }
+
+    public static AdminManageReviewPO getAdminManageReviewPage(WebDriver driver) {
+        return new AdminManageReviewPO(driver);
+    }
+
+    public static AdminManageOrderPO getAdminManageOrderPage(WebDriver driver) {
+        return new AdminManageOrderPO(driver);
+    }
+
+    public static AdminReviewDetailPO getAdminReviewDetailPage(WebDriver driver) {
+
+        return new AdminReviewDetailPO(driver);
+    }
+
+    public static AdminManageInvoicePO getAdminInvoicePage(WebDriver driver) {
+        return new AdminManageInvoicePO(driver);
+    }
+
+
 }

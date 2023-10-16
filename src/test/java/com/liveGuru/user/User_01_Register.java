@@ -40,7 +40,7 @@ public class User_01_Register extends BaseTest {
         homePage = PageGeneratorManager.getUserHomePage(driver);
 
         log.info("Pre conditions - Step 02: Click to 'My Account' link at the footer");
-        homePage.clickToFooterLinkByText(driver, "My Account");
+        homePage.clickToDynamicFooterLinkByText(driver, "My Account");
         loginPage = PageGeneratorManager.getUserLoginPage(driver);
 
         log.info("Pre conditions - Step 03: Click to 'Create an Account' button");

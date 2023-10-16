@@ -22,6 +22,11 @@ public class UserLoginPO extends BasePage {
     public UserAccountPO clickToLoginButton() {
         waitForElementClickable(driver, UserLoginPageUI.LOGIN_BUTTON);
         clickToElement(driver, UserLoginPageUI.LOGIN_BUTTON);
-        return PageGeneratorManager.getUserMyAccountPage(driver);
+        return PageGeneratorManager.getUserAccountPage(driver);
+    }
+
+    public String getErrorMessageUnderPageTitle() {
+        waitForElementVisibility(driver, UserLoginPageUI.ERROR_MESSAGE_UNDER_PAGE_TITLE);
+        return getElementText(driver, UserLoginPageUI.ERROR_MESSAGE_UNDER_PAGE_TITLE);
     }
 }

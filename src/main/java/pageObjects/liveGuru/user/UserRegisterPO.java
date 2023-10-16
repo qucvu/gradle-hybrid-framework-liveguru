@@ -16,6 +16,6 @@ public class UserRegisterPO extends BasePage {
     public UserAccountPO clickToRegisterButton() {
         waitForElementClickable(driver, UserRegisterPageUI.REGISTER_BUTTON);
         clickToElement(driver, UserRegisterPageUI.REGISTER_BUTTON);
-        return PageGeneratorManager.getUserMyAccountPage(driver);
+        return PageGeneratorManager.getUserAccountPage(driver);
     }
 }

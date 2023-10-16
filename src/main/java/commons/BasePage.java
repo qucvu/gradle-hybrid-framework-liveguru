@@ -1,5 +1,6 @@
 package commons;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.Color;
@@ -7,10 +8,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import pageObjects.liveGuru.user.UserLoginPO;
-import pageObjects.liveGuru.user.UserMyWishlistPO;
-import pageObjects.liveGuru.user.UserProductCategoryPO;
-import pageObjects.liveGuru.user.UserProductComparisonPO;
+import pageObjects.liveGuru.user.*;
 import pageUIs.liveGuru.user.LiveGuruBasePageUI;
 import pageUIs.liveGuru.user.UserAccountPageUI;
 
@@ -21,10 +19,9 @@ import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -449,6 +446,12 @@ public class BasePage {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", getWebElement(driver, locatorType));
     }
 
+    protected void clickToElementByJS(WebDriver driver, String locatorType, String... dynamicValues) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", getWebElement(driver, getDynamicXpath(locatorType, dynamicValues)));
+
+    }
+
+
     protected void scrollToElement(WebDriver driver, String locatorType) {
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
         jsExecutor.executeScript("arguments[0].scrollIntoView(true);", getWebElement(driver, locatorType));
@@ -567,7 +570,6 @@ public class BasePage {
     protected void waitForAllElementVisibility(WebDriver driver, String locatorType, String... dynamicValues) {
         WebDriverWait explicitWait = new WebDriverWait(driver, longTimeout);
         explicitWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(getByLocator(getDynamicXpath(locatorType, dynamicValues))));
-
     }
 
     protected void waitForAllElementInVisibility(WebDriver driver, String locatorType) {
@@ -614,10 +616,145 @@ public class BasePage {
         List<WebElement> elementList = getListElements(driver, locator);
         ArrayList<String> dataList = new ArrayList<String>();
         for (WebElement element : elementList) {
-            dataList.add(element.getText());
+            dataList.add(element.getText().trim().toLowerCase());
         }
         List<String> sortList = new ArrayList<String>(dataList);
         Collections.sort(sortList);
+        return sortList.equals(dataList);
+    }
+
+    public boolean isDataStringSortAsc(WebDriver driver, String locator, String... dynamicValues) {
+        List<WebElement> elementList = getListElements(driver, locator, dynamicValues);
+        ArrayList<String> dataList = new ArrayList<String>();
+        for (WebElement element : elementList) {
+            dataList.add(element.getText().trim().toLowerCase());
+        }
+        List<String> sortList = new ArrayList<String>(dataList);
+        Collections.sort(sortList);
+        return sortList.equals(dataList);
+    }
+
+    public boolean isDataStringSortDesc(WebDriver driver, String locator) {
+        List<String> dataList = new ArrayList<String>();
+        List<WebElement> elementList = getListElements(driver, locator);
+        for (WebElement element : elementList) {
+            dataList.add(element.getText().trim().toLowerCase());
+        }
+        List<String> sortList = new ArrayList<String>(dataList);
+
+        Collections.sort(sortList);
+        Collections.reverse(sortList);
+        return sortList.equals(dataList);
+    }
+
+    public boolean isDataStringSortDesc(WebDriver driver, String locator, String... dynamicValues) {
+        List<String> dataList = new ArrayList<String>();
+        List<WebElement> elementList = getListElements(driver, locator, dynamicValues);
+        for (WebElement element : elementList) {
+            dataList.add(element.getText().trim().toLowerCase());
+        }
+        List<String> sortList = new ArrayList<String>(dataList);
+
+        Collections.sort(sortList);
+        Collections.reverse(sortList);
+        return sortList.equals(dataList);
+    }
+
+    public boolean isDataNumberSortAsc(WebDriver driver, String locator) {
+        List<WebElement> elementList = getListElements(driver, locator);
+        ArrayList<Float> dataList = new ArrayList<Float>();
+        for (WebElement element : elementList) {
+            dataList.add(Float.parseFloat(element.getText().trim()));
+        }
+        List<Float> sortList = new ArrayList<Float>(dataList);
+        Collections.sort(sortList);
+        return sortList.equals(dataList);
+    }
+
+    public boolean isDataNumberSortAsc(WebDriver driver, String locator, String... dynamicValues) {
+        List<WebElement> elementList = getListElements(driver, locator, dynamicValues);
+        ArrayList<Long> dataList = new ArrayList<Long>();
+        for (WebElement element : elementList) {
+            dataList.add(Long.parseLong(element.getText().trim()));
+        }
+        List<Long> sortList = new ArrayList<Long>(dataList);
+        Collections.sort(sortList);
+        return sortList.equals(dataList);
+    }
+
+    public boolean isDataNumberSortDesc(WebDriver driver, String locator) {
+        List<WebElement> elementList = getListElements(driver, locator);
+        ArrayList<Float> dataList = new ArrayList<Float>();
+        for (WebElement element : elementList) {
+            dataList.add(Float.parseFloat(element.getText().trim()));
+        }
+        List<Float> sortList = new ArrayList<Float>(dataList);
+        Collections.sort(sortList);
+        Collections.reverse(sortList);
+        return sortList.equals(dataList);
+    }
+
+    public boolean isDataNumberSortDesc(WebDriver driver, String locator, String... dynamicValues) {
+        List<WebElement> elementList = getListElements(driver, locator, dynamicValues);
+        ArrayList<Long> dataList = new ArrayList<Long>();
+        for (WebElement element : elementList) {
+            dataList.add(Long.parseLong(element.getText().trim()));
+        }
+        List<Long> sortList = new ArrayList<Long>(dataList);
+        Collections.sort(sortList);
+        Collections.reverse(sortList);
+        return sortList.equals(dataList);
+    }
+
+    /**
+     * @param driver  Webdriver
+     * @param option  asc: ascending, desc: descending
+     * @param locator locator of off all data
+     * @return if sort or not
+     */
+    public boolean isDataDateSortByOption(WebDriver driver, String option, String locator) {
+        List<WebElement> elementList = getListElements(driver, locator);
+        ArrayList<Date> dataList = new ArrayList<Date>();
+        for (WebElement element : elementList) {
+            dataList.add(convertStringToDate(element.getText().trim(), "MMM dd, yyyy h:mm:ss a"));
+        }
+        List<Date> sortList = new ArrayList<Date>(dataList);
+        Collections.sort(sortList);
+        if (option.equals("asc")) {
+            Collections.reverse(sortList);
+        }
+        Collections.reverse(sortList);
+        return sortList.equals(dataList);
+    }
+
+    /**
+     * @param driver  Webdriver
+     * @param option  asc: ascending, desc: descending
+     * @param locator locator of off all data
+     * @return if sort or not
+     */
+    public boolean isDataDateSortByOption(WebDriver driver, String option, String locator, String... dynamicValues) {
+        List<WebElement> elementList = getListElements(driver, locator, dynamicValues);
+        ArrayList<Date> dataList = new ArrayList<Date>();
+        for (WebElement element : elementList) {
+            dataList.add(convertStringToDate(element.getText().trim(), "MMM dd, yyyy h:mm:ss a"));
+        }
+        List<Date> sortList = new ArrayList<Date>(dataList);
+        Collections.sort(sortList);
+        if (option.equals("asc")) {
+            Collections.reverse(sortList);
+        }
+        Collections.reverse(sortList);
+        return sortList.equals(dataList);
+    }
+
+
+    public boolean isDataStringSortDescLamDa(WebDriver driver, String locator) {
+        List<WebElement> elementList = getListElements(driver, locator);
+        List<String> dataList = elementList.stream().map(n -> n.getText()).collect(Collectors.toList());
+        List<String> sortList = new ArrayList<String>(dataList);
+        Collections.sort(sortList);
+        Collections.reverse(sortList);
         return sortList.equals(dataList);
     }
 
@@ -629,29 +766,6 @@ public class BasePage {
         return sortList.equals(dataList);
     }
 
-    public boolean isDataStringSortDesc(WebDriver driver, String locator) {
-        List<String> dataList = new ArrayList<String>();
-
-        List<WebElement> elementList = getListElements(driver, locator);
-
-        for (WebElement element : elementList) {
-            dataList.add(element.getText());
-        }
-        List<String> sortList = new ArrayList<String>(dataList);
-
-        Collections.sort(sortList);
-        Collections.reverse(sortList);
-        return sortList.equals(dataList);
-    }
-
-    public boolean isDataStringSortDescLamDa(WebDriver driver, String locator) {
-        List<WebElement> elementList = getListElements(driver, locator);
-        List<String> dataList = elementList.stream().map(n -> n.getText()).collect(Collectors.toList());
-        List<String> sortList = new ArrayList<String>(dataList);
-        Collections.sort(sortList);
-        Collections.reverse(sortList);
-        return sortList.equals(dataList);
-    }
 
     /**
      * Enter to dynamic textbox by ID
@@ -671,7 +785,7 @@ public class BasePage {
      * @param driver
      * @param textLink The text link onUI
      */
-    public void clickToFooterLinkByText(WebDriver driver, String textLink) {
+    public void clickToDynamicFooterLinkByText(WebDriver driver, String textLink) {
         waitForElementClickable(driver, LiveGuruBasePageUI.FOOTER_LINK_BY_TEXT, textLink);
         clickToElement(driver, LiveGuruBasePageUI.FOOTER_LINK_BY_TEXT, textLink);
     }
@@ -764,6 +878,11 @@ public class BasePage {
         return isElementDisplayed(driver, UserAccountPageUI.CURRENT_ACTIVE_LINK_AT_LEFT_SIDEBAR, linkText);
     }
 
+    public UserAccountPO clickToMyAccountLinkAtAccountLinkHeader(WebDriver driver) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.MY_ACCOUNT_LINK_AT_ACCOUNT_HEADER);
+        clickToElement(driver, LiveGuruBasePageUI.MY_ACCOUNT_LINK_AT_ACCOUNT_HEADER);
+        return PageGeneratorManager.getUserAccountPage(driver);
+    }
 
     public UserProductCategoryPO clickToTVLinkAtHeaderNav(WebDriver driver) {
         waitForElementClickable(driver, LiveGuruBasePageUI.TV_LINK_AT_NAVIGATION_BAR);
@@ -780,5 +899,175 @@ public class BasePage {
     public void selectToDefaultDropdownById(WebDriver driver, String Id, String textOption) {
         waitForElementClickable(driver, LiveGuruBasePageUI.DYNAMIC_DEFAULT_DROPDOWN_BY_ID, Id);
         selectItemInDefaultDropdown(driver, LiveGuruBasePageUI.DYNAMIC_DEFAULT_DROPDOWN_BY_ID, textOption, Id);
+    }
+
+    public void closeTheIncomingMessagePopupAdminPage(WebDriver driver) {
+        if (!isElementUndisplayed(driver, LiveGuruBasePageUI.INCOMING_MESSAGE_POPUP_ADMIN_PAGE)) {
+            waitForElementClickable(driver, LiveGuruBasePageUI.INCOMING_MESSAGE_POPUP_ADMIN_PAGE);
+            clickToElement(driver, LiveGuruBasePageUI.CLOSE_LINK_INCOMING_MESSAGE_POPUP);
+        }
+    }
+
+    public void hoverToDynamicHeaderLinkByNameAdminPage(WebDriver driver, String name) {
+        waitForElementVisibility(driver, LiveGuruBasePageUI.HEADER_LINK_BY_NAME_ADMIN_PAGE, name);
+        hoverMouseToElement(driver, LiveGuruBasePageUI.HEADER_LINK_BY_NAME_ADMIN_PAGE, name);
+    }
+
+    public void clickToDynamicHeaderLinkByNameAdminPage(WebDriver driver, String name) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.HEADER_LINK_BY_NAME_ADMIN_PAGE, name);
+        clickToElement(driver, LiveGuruBasePageUI.HEADER_LINK_BY_NAME_ADMIN_PAGE, name);
+
+    }
+
+    public boolean isMessageDisplayedAboveHeaderAdminPage(WebDriver driver, String message) {
+        waitForElementVisibility(driver, LiveGuruBasePageUI.TITLE_MESSAGE_ABOVE_HEADER_BY_MESSAGE, message);
+        return isElementDisplayed(driver, LiveGuruBasePageUI.TITLE_MESSAGE_ABOVE_HEADER_BY_MESSAGE, message);
+    }
+
+
+    public void clickToSubmitButtonAdminPage(WebDriver driver) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.SUBMIT_BUTTON);
+        clickToElement(driver, LiveGuruBasePageUI.SUBMIT_BUTTON);
+    }
+
+
+    public void clickToSearchButtonAdminPage(WebDriver driver) {
+        waitForLoadingMaskUnInvisibility(driver);
+        checkToDefaultCheckboxRadio(driver, LiveGuruBasePageUI.SEARCH_BUTTON);
+
+    }
+
+    public void waitForLoadingMaskUnInvisibility(WebDriver driver) {
+        waitForElementInvisibility(driver, LiveGuruBasePageUI.LOADING_MASK);
+    }
+
+    public boolean isFileDownloaded(String downloadPath, String fileName) {
+        boolean isDownloaded = false;
+        File dir = new File(downloadPath);
+        File[] dirContents = dir.listFiles();
+        for (int i = 0; i < Objects.requireNonNull(dirContents).length; i++) {
+            if (dirContents[i].getName().contains(fileName)) {
+                waitForFileToDownload(String.valueOf(dirContents[i]), GlobalConstants.LONG_TIMEOUT);
+                dirContents[i].delete();
+                isDownloaded = true;
+            }
+        }
+        return isDownloaded;
+    }
+
+    public boolean waitForFileToDownload(String expectedFullPathName, int maxWaitSeconds) {
+        File downloadedFile = new File(expectedFullPathName);
+        System.out.println("Download file: " + downloadedFile);
+        long startTime = System.currentTimeMillis();
+
+        while (!downloadedFile.exists()) {
+            long currentTime = System.currentTimeMillis();
+            long elapsedTime = TimeUnit.MILLISECONDS.toSeconds(currentTime - startTime);
+            if (elapsedTime > maxWaitSeconds) {
+                return false;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return true;
+    }
+
+    private static Date convertStringToDate(String dateString, String pattern) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        try {
+            return dateFormat.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void clickToSortASCByTitle(WebDriver driver, String title) {
+        waitForElementVisibility(driver, LiveGuruBasePageUI.SORT_TITLE_BY_TITLE, title);
+        String titleAttribute = getElementAttribute(driver, "title", LiveGuruBasePageUI.SORT_TITLE_BY_TITLE, title);
+        if (titleAttribute.equals("asc")) {
+            waitForElementClickable(driver, LiveGuruBasePageUI.SORT_TITLE_BY_TITLE, title);
+            clickToElement(driver, LiveGuruBasePageUI.SORT_TITLE_BY_TITLE, title);
+        }
+    }
+
+    public void clickToSortDESCByTitle(WebDriver driver, String title) {
+        waitForElementVisibility(driver, LiveGuruBasePageUI.SORT_TITLE_BY_TITLE, title);
+        String titleAttribute = getElementAttribute(driver, "title", LiveGuruBasePageUI.SORT_TITLE_BY_TITLE, title);
+        if (titleAttribute.equals("desc")) {
+            waitForElementClickable(driver, LiveGuruBasePageUI.SORT_TITLE_BY_TITLE, title);
+            clickToElement(driver, LiveGuruBasePageUI.SORT_TITLE_BY_TITLE, title);
+        }
+
+    }
+
+    public int getQuantityItemSelectedCheckboxAdminPage(WebDriver driver) {
+        waitForLoadingMaskUnInvisibility(driver);
+        waitForAllElementVisibility(driver, LiveGuruBasePageUI.CHECKBOX_ROW_ITEM);
+        List<WebElement> checkboxList = getListElements(driver, LiveGuruBasePageUI.CHECKBOX_ROW_ITEM);
+        System.out.println("Size:" + checkboxList.size());
+        int countCheckboxSelected = 0;
+        for (WebElement checkbox : checkboxList) {
+            if (checkbox.isSelected()) {
+                countCheckboxSelected++;
+            }
+        }
+        return countCheckboxSelected;
+
+    }
+
+    public boolean isDataNumberSortASCByTitleColumn(WebDriver driver, String columnName) {
+        int columnIndex = getElementsSize(driver, LiveGuruBasePageUI.INDEX_COLUMN_BY_COLUMN_NAME, columnName) + 1;
+        waitForLoadingMaskUnInvisibility(driver);
+        waitForAllElementVisibility(driver, LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+        return isDataNumberSortAsc(driver, LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+    }
+
+    public boolean isDataNumberSortDESCByTitleColumn(WebDriver driver, String columnName) {
+        int columnIndex = getElementsSize(driver, LiveGuruBasePageUI.INDEX_COLUMN_BY_COLUMN_NAME, columnName) + 1;
+        waitForLoadingMaskUnInvisibility(driver);
+        waitForAllElementVisibility(driver, LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+        return isDataNumberSortDesc(driver, LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+    }
+
+    public boolean isDataDateSortByTitleColumnAndOption(WebDriver driver, String columnName, String option) {
+        int columnIndex = getElementsSize(driver, LiveGuruBasePageUI.INDEX_COLUMN_BY_COLUMN_NAME, columnName) + 1;
+        waitForLoadingMaskUnInvisibility(driver);
+        waitForAllElementVisibility(driver, LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+        if (option.equals("asc")) {
+            return isDataDateSortByOption(driver, "asc", LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+        }
+        return isDataDateSortByOption(driver, "desc", LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+    }
+
+
+    public boolean isDataStringSortASCByTitleColumn(WebDriver driver, String columnName) {
+        int columnIndex = getElementsSize(driver, LiveGuruBasePageUI.INDEX_COLUMN_BY_COLUMN_NAME, columnName) + 1;
+        waitForLoadingMaskUnInvisibility(driver);
+        waitForAllElementVisibility(driver, LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+        return isDataStringSortAsc(driver, LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+    }
+
+    public boolean isDataStringSortDESCByTitleColumn(WebDriver driver, String columnName) {
+        int columnIndex = getElementsSize(driver, LiveGuruBasePageUI.INDEX_COLUMN_BY_COLUMN_NAME, columnName) + 1;
+        waitForLoadingMaskUnInvisibility(driver);
+        waitForAllElementVisibility(driver, LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+        return isDataStringSortDesc(driver, LiveGuruBasePageUI.COLUMN_DATA_BY_INDEX_COLUMN, String.valueOf(columnIndex));
+
+    }
+
+    public int getQuantityItemRowDisplayedAdminPage(WebDriver driver) {
+        waitForLoadingMaskUnInvisibility(driver);
+        waitForAllElementVisibility(driver, LiveGuruBasePageUI.CHECKBOX_ROW_ITEM);
+        return getElementsSize(driver, LiveGuruBasePageUI.CHECKBOX_ROW_ITEM);
+    }
+
+    public void selectToViewPerPageDropdownAdminPage(WebDriver driver, String textValue) {
+        waitForElementClickable(driver, LiveGuruBasePageUI.VIEW_PER_PAGE_DROPDOWN);
+        selectItemInDefaultDropdown(driver, LiveGuruBasePageUI.VIEW_PER_PAGE_DROPDOWN, textValue);
     }
 }

@@ -28,4 +28,8 @@ public class UserAccountPO extends BasePage {
         return getElementText(driver, UserAccountPageUI.CURRENT_TAB_TITLE);
     }
 
+    public void clickToSaveButton() {
+        waitForElementClickable(driver, UserAccountPageUI.SAVE_BUTTON);
+        clickToElement(driver, UserAccountPageUI.SAVE_BUTTON);
+    }
 }
